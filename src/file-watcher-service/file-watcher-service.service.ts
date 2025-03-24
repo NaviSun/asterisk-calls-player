@@ -25,7 +25,7 @@ export class FileWatcherService implements OnModuleInit {
 
     // Обработка события добавления файла
     this.watcher.on("add", async (filePath, root) => {
-      console.log(`File ${root + "\\" + filePath} has been added`);
+      console.log(`File ${root + "/" +':::' + filePath} has been added`);
 
       // Проверяем, существует ли файл в базе данных
       const existFile = await this.audioFileService.exist(filePath);
