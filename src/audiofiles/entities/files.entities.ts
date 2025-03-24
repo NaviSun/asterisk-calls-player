@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('adidofiles')
+@Entity('audiofiles')
 export class AudioFileEntity {
   @PrimaryGeneratedColumn()
   id: number;

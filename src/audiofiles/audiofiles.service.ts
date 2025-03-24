@@ -16,7 +16,7 @@ export class AudioFilesService {
   }
 
   async exist(filePath): Promise<AudioFileEntity | null> {
-    const file = this.audioFileRepository.findOneBy({ filePath });
+    const file = this.audioFileRepository.findOneBy({ fileName: filePath });
     return file;
   }
 
