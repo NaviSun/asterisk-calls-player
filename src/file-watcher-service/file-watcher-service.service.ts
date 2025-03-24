@@ -33,7 +33,7 @@ export class FileWatcherService implements OnModuleInit {
       if (existFile === null) {
         console.log('Файл не существет');
         // Оптимизация информации о файле
-        const fileInfo = this.fileOptimize(root + "\\" + filePath);
+        const fileInfo = this.fileOptimize(root + "/" + filePath);
 
         // Сохраняем файл в базу данных
         await this.audioFileService.create(fileInfo);
@@ -50,9 +50,10 @@ export class FileWatcherService implements OnModuleInit {
   // Метод для оптимизации информации о файле
   fileOptimize(filePath: string): CreateAduioFileDto {
     const filePathArr = filePath.split(path.sep);
-    const removedArr = filePathArr.splice(4, 4); // Убираем первый элемент (путь к корневой директории)
+    const removedArr = filePathArr.splice(3); // Убираем первый элемент (путь к корневой директории)
     const fileInfo = removedArr[3].split("_"); // Имя файла (например, 20250313-154949_9788810840_9890092525.wav)
-    console.log(fileInfo);
+    console.log(fileInfo, ':::: FileInfo');
+    console.log(removedArr, ':::: removeAdr');
 
     // Создаем объект с информацией о файле
     const fileInfoObj: CreateAduioFileDto = {
