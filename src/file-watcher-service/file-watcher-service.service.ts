@@ -14,6 +14,10 @@ export class FileWatcherService implements OnModuleInit {
     // Инициализация наблюдателя
     this.watcher = sane(process.env.WATCH_DIR, {
       glob: ["**/*.wav"], // Отслеживаем только .wav файлы
+      ignored: [
+        '**/@Recycle/**',
+        '**/.*'
+      ],
       watchman: false,
       poll: true,
       interval: 1000, // Отключаем Watchman (если не используется)
