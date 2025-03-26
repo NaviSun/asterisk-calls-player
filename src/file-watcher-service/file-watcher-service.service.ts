@@ -101,8 +101,9 @@ export class FileWatcherService implements OnModuleInit {
 
   private async processFile(filePath: string) {
     try {
-      const fileName = filePath.split(path.sep);
-      const exists = await this.audioFileService.exist(fileName[3]);
+      const fileName: string[] = filePath.split(path.sep);
+      const exists = await this.audioFileService.exist(fileName[fileName.length - 1]);
+      this.logger.log(`exist file -> ${exists}`)
       if (exists !== null) {
         this.logger.debug(`File already in DB: ${filePath}`);
         return;
