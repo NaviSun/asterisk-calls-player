@@ -121,7 +121,7 @@ export class FileWatcherService implements OnModuleInit {
   prepareFileInfo(filePath: string): CreateAduioFileDto {
     const filePathArr = filePath.split(path.sep);
     const fileInfo = filePathArr[3].split("_"); // Имя файла (например, 20250313-154949_9788810840_9890092525.wav)
-    this.logger.log(fileInfo, ':::: FileInfo');
+    this.logger.log(`FilePath -> ${filePath} FilePathArr -> ${filePathArr} FileInfo -> ${fileInfo}`);
 
     // Создаем объект с информацией о файле
     const fileInfoObj: CreateAduioFileDto = {
