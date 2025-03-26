@@ -5,7 +5,7 @@ import { CreateAduioFileDto } from "src/audiofiles/dto/create-audio.dto";
 import * as path from "path";
 import * as fs from 'fs';
 import { promisify } from 'util';
-import { ConfigService } from "@nestjs/config";
+
 
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
@@ -107,8 +107,9 @@ export class FileWatcherService implements OnModuleInit {
         this.logger.debug(`File already in DB: ${filePath}`);
         return;
       }
-
+      
       const fileInfo = this.prepareFileInfo(filePath);
+      this.logger.log(`processFile-> exist ${exists} FileName -> ${fileName} ->FileInfo ${fileInfo}`)
       await this.audioFileService.create(fileInfo);
       this.logger.log(`Successfully processed: ${filePath}`);
     } catch (err) {
