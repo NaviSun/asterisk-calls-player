@@ -2,9 +2,9 @@ module.exports = {
   apps: [
     {
         name: 'asterisk_calls',
-        script: 'npm start',
+        script: 'npm start:dev',
         next_gen_js: true,
-        watch: false,
+        watch: true,
             ignore_watch: ['node_modules'],
             watch_delay: 1000,
         env: {
