@@ -1,10 +1,11 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import * as sane from "sane";
-import { AudioFilesService } from "src/audiofiles/audiofiles.service";
-import { CreateAduioFileDto } from "src/audiofiles/dto/create-audio.dto";
+import { AudioFilesService } from "../audiofiles/audiofiles.service";
+import { CreateAduioFileDto } from "../audiofiles/dto/create-audio.dto";
 import * as path from "path";
 import * as fs from "fs";
 import { promisify } from "util";
+import { ConfigService } from "@nestjs/config";
 
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
@@ -15,11 +16,14 @@ export class FileWatcherService implements OnModuleInit {
   private readonly logger = new Logger(FileWatcherService.name);
   private processedFiles = new Set<string>();
 
-  constructor(private readonly audioFileService: AudioFilesService) {}
+  constructor(
+    private readonly audioFileService: AudioFilesService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async onModuleInit() {
     // 1. Ручное сканирование существующих файлов
-    await this.scanExistingFiles(process.env.WATCH_DIR);
+    await this.scanExistingFiles(this.configService.get('WATCH_DIR'));
 
     // 2. Инициализация вотчера для новых файлов
     this.initWatcher();
