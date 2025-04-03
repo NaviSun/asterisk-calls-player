@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import * as sane from "sane";
-import { AudioFilesService } from "src/audiofiles/audiofiles.service";
-import { CreateAduioFileDto } from "src/audiofiles/dto/create-audio.dto";
+import { AudioFilesService } from "../audiofiles/audiofiles.service";
+import { CreateAduioFileDto } from "../audiofiles/dto/create-audio.dto";
 import * as path from "path";
 import * as fs from "fs";
 import { promisify } from "util";
