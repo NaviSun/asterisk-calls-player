@@ -13,12 +13,12 @@ export class AudioFilesService {
   ) { }
 
 
-  async create(filePath: CreateAduioFileDto): Promise<AudioFileEntity> {
-    return this.audioFileRepository.save(filePath);
+  async create(fileData: CreateAduioFileDto): Promise<AudioFileEntity> {
+    return this.audioFileRepository.save(fileData);
   }
 
-  async exist(filePath): Promise<AudioFileEntity | null> {
-    const file = this.audioFileRepository.findOneBy({ fileName: filePath });
+  async exist(fileName): Promise<AudioFileEntity | null> {
+    const file = this.audioFileRepository.findOneBy({ fileName: fileName });
     return file;
   }
 

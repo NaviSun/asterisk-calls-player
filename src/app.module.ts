@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileWatcherServiceModule } from './file-watcher-service/file-watcher-service.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AudioFileEntity } from './audiofiles/entities/files.entities';
 import { AudioFilesModule } from './audiofiles/audiofiles.module';
 import { getDbConfig } from './config/typeorm.config';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,8 @@ import { getDbConfig } from './config/typeorm.config';
     ),
     AudioFilesModule,
     FileWatcherServiceModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, ConfigService],
