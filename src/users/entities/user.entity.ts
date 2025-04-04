@@ -1,37 +1,43 @@
-import { PrimaryGeneratedColumn, Column, Entity } from "typeorm";
+import { PrimaryGeneratedColumn, Column, Entity, BeforeUpdate } from "typeorm";
+import { UserRole } from "../user-role.enum";
 
 @Entity('users')
 export class UserEntity {
-      @PrimaryGeneratedColumn()
-      id: number;
-      
-      @Column(require)
-      firstName: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  firstName: string;
 
-      @Column(require)
-      lastName: string;
+  @Column()
+  lastName: string;
 
-      @Column({default: null})
-      avatar: string;
+  @Column({ nullable: true })
+  avatar: string | null;
 
-      @Column({unique: true, })
-      email: string;
-    
-      @Column()
-      passwordHash: string;
-    
-      @Column({default: true})
-      banned: boolean;
-    
-      @Column({unique: true, default: 'Need Access from Admin'})
-      banReason: string;
+  @Column({ unique: true })
+  email: string;
 
-      @Column({default: 'user'})
-      role: string;
-    
-      @Column()
-      createdAt: Date;
+  @Column()
+  passwordHash: string;
 
-      @Column()
-      updatedAt: Date;
+  @Column({ default: true })
+  banned: boolean;
+
+  @Column({ nullable: true })
+  banReason: string | null;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
+
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updatedAt = new Date();
+  }
 }
