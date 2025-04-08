@@ -14,11 +14,14 @@ import {
     ApiOperation,
     ApiResponse,
     ApiBody,
-    ApiQuery
+    ApiQuery,
+    ApiBearerAuth
 } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
 
+
 @ApiTags('Audio Files Management')
+@ApiBearerAuth()
 @Controller('audiofiles/file')
 @UseFilters(new HttpExceptionFilter())
 export class AudiofilesController {
@@ -125,4 +128,5 @@ export class AudiofilesController {
             pagination.limit
         );
     }
+
 }

@@ -1,5 +1,7 @@
 import { PrimaryGeneratedColumn, Column, Entity, BeforeUpdate } from "typeorm";
-import { UserRole } from "../user-role.enum";
+import { UserRole } from "../enums/user-role.enum";
+import { Premission, PremissionType } from "./../../auth/premission.type";
+
 
 @Entity('users')
 export class UserEntity {
@@ -12,8 +14,8 @@ export class UserEntity {
   @Column()
   lastName: string;
 
-  @Column({ nullable: true })
-  avatar: string | null;
+  @Column({ default: '' })
+  avatar: string;
 
   @Column({ unique: true })
   email: string;
@@ -24,11 +26,14 @@ export class UserEntity {
   @Column({ default: true })
   banned: boolean;
 
-  @Column({ nullable: true })
-  banReason: string | null;
+  @Column({ default: '' })
+  banReason: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: UserRole;
+
+  @Column({enum: Premission, default: [], type: 'json'})
+  premissions: PremissionType[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

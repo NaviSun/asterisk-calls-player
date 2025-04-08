@@ -1,14 +1,12 @@
-import { 
-  Injectable, 
-  NotFoundException, 
-  ConflictException, 
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
   BadRequestException,
   ForbiddenException,
   Logger,
-  UnauthorizedException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import {
@@ -18,8 +16,8 @@ import {
   AdminUpdateUserDto
 } from './dto/update-user.dto';
 import { Request } from 'express';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserRole } from './user-role.enum';
+import { Repository } from 'typeorm';
+
 
 @Injectable()
 export class UsersService {
@@ -28,51 +26,21 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
-  private getValidRole(role?: string): UserRole {
-    if (role && Object.values(UserRole).includes(role as UserRole)) {
-      return role as UserRole;
-    }
-    return UserRole.USER;
-  }
-
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const { email, password, ...rest } = createUserDto;
-    
-    const existingUser = await this.userRepository.findOneBy({ email });
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
-
-    const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    // Вариант 1: с использованием create()
-    const userData: DeepPartial<UserEntity> = {
-      ...rest,
-      email,
-      passwordHash,
-      role: this.getValidRole(createUserDto.role),
-      banned: false,
-      banReason: null,
-      avatar: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    const user = this.userRepository.create(userData);
-
-
-    return await this.userRepository.save(user);
-  }
+  /* 
+    Поиск пользователя по Email
+  */
 
   async findOne(email: string): Promise<UserEntity | null> {
     return this.userRepository.findOneBy({ email });
   }
-
+  /* 
+    ==== Обновление данных пользователя
+  */
   async updateUser(id: number, updateUserDto: UpdateUserDto, req: Request): Promise<UserEntity> {
-    this.validateUserAccess(id, req);
-    
+    /* this.validateUserAccess(id, req); */
+
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -86,9 +54,14 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
+
+  /* 
+  ===== Обновление Аватар Пользователя
+  */
+
   async updateAvatar(id: number, avatar: string, req: Request): Promise<UserEntity> {
-    this.validateUserAccess(id, req);
-    
+    /* this.validateUserAccess(id, req); */
+
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -97,40 +70,40 @@ export class UsersService {
     user.avatar = avatar;
     return this.userRepository.save(user);
   }
-
+  /* 
+    ===== Смена пароля пользователя
+  */
   async changePassword(
-    id: number, 
-    changePasswordDto: ChangePasswordDto, 
+    id: number,
+    changePasswordDto: ChangePasswordDto,
     req: Request
   ): Promise<UserEntity> {
-    this.validateUserAccess(id, req);
-    
+    /*  this.validateUserAccess(id, req); */
+
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    await this.validatePasswordAttempts(user);
     await this.validateCurrentPassword(user, changePasswordDto.currentPassword);
 
     const salt = await bcrypt.genSalt();
     user.passwordHash = await bcrypt.hash(changePasswordDto.newPassword, salt);
     user.updatedAt = new Date();
-    
+
     await this.userRepository.save(user);
-    await this.invalidateAllTokens(user.id);
-    
     return user;
   }
 
+  /* 
+    ==== Обновить статус доступа banned 
+  */
+
   async updateStatus(
-    id: number, 
+    id: number,
     updateStatusDto: UpdateUserStatusDto,
     currentUser: UserEntity
   ): Promise<UserEntity> {
-    if (currentUser.role !== 'admin') {
-      throw new ForbiddenException('Only admin can update user status');
-    }
 
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
@@ -138,19 +111,18 @@ export class UsersService {
     }
 
     user.banned = updateStatusDto.banned;
-    if(updateStatusDto.banReason !== undefined){
-      user.banReason = updateStatusDto.banned ? updateStatusDto.banReason : null;
-    }
-
-    if (updateStatusDto.banned) {
-      await this.invalidateAllTokens(user.id);
+    if (updateStatusDto.banReason !== undefined) {
+      user.banReason = updateStatusDto.banned ? updateStatusDto.banReason : '';
     }
 
     return this.userRepository.save(user);
   }
 
+  /* 
+    ======== Обновление данных пользователя
+  */
   async adminUpdateUser(
-    id: number, 
+    id: number,
     adminUpdateDto: AdminUpdateUserDto,
     currentUser: UserEntity
   ): Promise<UserEntity> {
@@ -175,20 +147,8 @@ export class UsersService {
     }
   }
 
-  private validateUserAccess(userId: number, req: Request): void {
-    if (!req.user) {
-      throw new UnauthorizedException('Пользователь не авторизован');
-    }
-  
-    const tokenUserId = req.user.id;
-    
-    if (userId !== tokenUserId) {
-      throw new ForbiddenException('Вы можете изменять только свой профиль');
-    }
-  }
-
   private async validateCurrentPassword(
-    user: UserEntity, 
+    user: UserEntity,
     currentPassword: string
   ): Promise<void> {
     const isPasswordValid = await bcrypt.compare(
@@ -200,17 +160,4 @@ export class UsersService {
     }
   }
 
-  private async validatePasswordAttempts(user: UserEntity): Promise<void> {
-    // Здесь можно добавить проверку попыток смены пароля
-    // Например, используя Redis для хранения счетчика попыток
-    // if (user.passwordAttempts >= this.PASSWORD_ATTEMPTS_LIMIT) {
-    //   throw new TooManyRequestsException('Too many password attempts');
-    // }
-  }
-
-  private async invalidateAllTokens(userId: number): Promise<void> {
-    // Здесь можно добавить логику инвалидации токенов
-    // Например, добавляя запись в Redis или увеличивая счетчик токенов
-    this.logger.log(`Invalidated all tokens for user ${userId}`);
-  }
 }

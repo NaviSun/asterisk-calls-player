@@ -32,4 +32,12 @@ export class CreateUserDto {
       description: 'Роль пользователя' 
     })
     role?: string;
+
+    @ApiProperty({ 
+      required: false,
+      enum: ['create_user', 'find_user', 'update_user'],
+      default: '',
+      description: 'Роль пользователя' 
+    })
+    premissions: [string];
   }

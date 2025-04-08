@@ -14,9 +14,19 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('asterisk')
     .addServer('/api') //Префикс для nginx
+    .addCookieAuth('accessToken', {
+      type: 'http',
+      in: 'Header',
+      scheme: 'Bearer'
+    })
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    }
+  });
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT ?? 4000);
 }
