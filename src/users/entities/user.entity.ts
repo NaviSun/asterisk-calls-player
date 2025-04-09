@@ -1,7 +1,5 @@
-import { PrimaryGeneratedColumn, Column, Entity, BeforeUpdate } from "typeorm";
-import { UserRole } from "../enums/user-role.enum";
-import { Premission, PremissionType } from "./../../auth/premission.type";
-
+import { PrimaryGeneratedColumn, Column, Entity, BeforeUpdate, JoinTable, ManyToMany } from "typeorm";
+import { RoleEntity } from "./../../role/entity/role.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -29,12 +27,6 @@ export class UserEntity {
   @Column({ default: '' })
   banReason: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
-  role: UserRole;
-
-  @Column({enum: Premission, default: [], type: 'json'})
-  premissions: PremissionType[];
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
@@ -45,4 +37,8 @@ export class UserEntity {
   updateTimestamp() {
     this.updatedAt = new Date();
   }
+
+  @ManyToMany(() => RoleEntity, (role) => role.users)
+  @JoinTable()
+  roles: RoleEntity[];
 }

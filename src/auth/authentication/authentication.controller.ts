@@ -1,16 +1,15 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
 import { ApiOperation, ApiBody, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
-import { UserResponse } from '../../users/dto/response.dto';
 import { AuthenticationService } from './authentication.service';
 import { SignInDto } from './dto/sign-in.dto/sign-in.dto';
 import { Auth } from '../decorators/auth.decorator';
 import { AuthType } from './enum/auth-type.enum';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { Roles } from './../../users/decorators/roles.decorator';
-import { UserRole } from 'src/users/enums/user-role.enum';
+// import { Roles } from './../../role/decorators/roles.decorator'; // Для защиты по ролям
+// import { UserRole } from './../../role/enums/user-role.enum'; // Для защиты по ролям
 import { Premissions } from '../decorators/premissions.decorator';
-import { Premission } from '../premission.type';
+import { Premission } from '../../role/premission.type';
 
 
 
@@ -20,9 +19,9 @@ import { Premission } from '../premission.type';
 @Controller('auth')
 export class AuthenticationController {
     constructor(private readonly authService: AuthenticationService) { }
-    // @Roles(UserRole.ADMIN)
-    @Premissions(Premission.CreateUser)
+
     @Post('register')
+    @Premissions(Premission.CreateUser)
     @ApiOperation({
         summary: 'Создание нового пользователя',
         description: 'Регистрирует нового пользователя в системе. Пароль будет захеширован перед сохранением.'
@@ -54,7 +53,6 @@ export class AuthenticationController {
     @ApiResponse({
         status: 201,
         description: 'Пользователь успешно создан',
-        type: UserResponse
     })
     @ApiResponse({
         status: 400,

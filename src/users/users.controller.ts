@@ -1,7 +1,6 @@
 import { Controller, Body, Get, Query, UsePipes, ValidationPipe, Param, Patch, UseFilters, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth,} from '@nestjs/swagger';
-import { UserResponse } from './dto/response.dto';
 import { UpdateUserDto, ChangePasswordDto, UpdateUserStatusDto } from './dto/update-user.dto';
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
@@ -32,7 +31,6 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Найденный пользователь',
-    type: UserResponse
   })
   @ApiResponse({
     status: 404,

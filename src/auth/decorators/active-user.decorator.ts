@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { REQUEST_USER_KEY } from '../auth.constants';
-import { ActiveUserData } from '../interface/JwtPayload.interface';
+import { ActiveUserData } from '../interface/active_user_data_jwt.interface';
 
 export const ActiveUser = createParamDecorator(
     (field: keyof ActiveUserData | undefined, ctx: ExecutionContext) => {

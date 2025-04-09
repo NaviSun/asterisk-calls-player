@@ -12,19 +12,20 @@ import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './authentication/guards/jwt-auth.guard';
 import { AuthenticationGuard } from './decorators/authetication.decorar';
 import { RefreshTokenIdsStorage } from './authentication/refresh-token-ids.storage/refresh-token-ids.storage';
-import { RolesGuard } from './../users/guards/roles/roles.guard';
-import { PremissionGuard } from 'src/users/guards/premissions.guard';
+
+import { PremissionGuard } from './../role/guards/premissions.guard';
+import { RoleEntity } from './../role/entity/role.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, RoleEntity]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     
   ],
   providers: [
     {
-      provide: HashingService, //Hash service abstarct class не может быть Инстансом классом 
+      provide: HashingService, 
       useClass: BcryptService,
     },
     {
@@ -33,7 +34,7 @@ import { PremissionGuard } from 'src/users/guards/premissions.guard';
     },
     {
       provide: APP_GUARD,
-      useClass: PremissionGuard   //RolesGuard  Or Premission Guard, optional guards
+      useClass: PremissionGuard   
     },
     AccessTokenGuard,
     AuthenticationService,

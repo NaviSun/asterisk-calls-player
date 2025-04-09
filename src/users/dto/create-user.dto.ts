@@ -27,14 +27,6 @@ export class CreateUserDto {
   
     @ApiProperty({ 
       required: false,
-      enum: ['user', 'admin', 'moderator'],
-      default: 'user',
-      description: 'Роль пользователя' 
-    })
-    role?: string;
-
-    @ApiProperty({ 
-      required: false,
       enum: ['create_user', 'find_user', 'update_user'],
       default: '',
       description: 'Роль пользователя' 

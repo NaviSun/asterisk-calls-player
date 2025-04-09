@@ -1,8 +1,8 @@
 
 
 ## Description
-NestJs Api, Parse Files .wav from your dir, and put they in to database.
-
+NestJs Api, Parse Files .wav from your dir, and put they in to database whith role <-----> Permissions Authetication
+ 
 exemple FilePath /mnt/dir/2025/01/01/20250101-150000_9780000000_9890000000.wav
 20250101-150000_9780000000_9890000000.wav
 year/month/day-hour/minuts/seconds_incoming phone number/out phone number.wav
@@ -14,7 +14,12 @@ DB_PORT=YOUR_PORT
 DB_USER=DB_USER
 DB_PASSWORD=DB_PASSWORD
 DATABASE=DATABASE NAME
-WATCH_DIR=/dir/
+WATCH_DIR=/yourDir
+JWT_SECRET_KEY=very_secret_key
+JWT_TOKEN_AUDIENCE=localhost:3000
+JWT_TOKEN_ISSUER=localhost:3000
+JWT_TOKEN_ACCESS_TTL=3600
+JWT_REFRESH_TOKEN_TTL=86400
 
 
 

@@ -1,7 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
 import { IsBoolean, IsDate, IsString, IsOptional, IsEmail, MinLength, IsEnum } from 'class-validator';
-import { UserRole } from '../enums/user-role.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 // Базовый DTO для обновления основных данных
@@ -21,15 +20,6 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsEmail()
   email?: string;
 
-  @ApiProperty({ 
-    enum: UserRole,
-    example: UserRole.USER,
-    description: 'Роль пользователя',
-    required: false 
-  })
-  @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
 }
 
 // DTO для обновления аватара

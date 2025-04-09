@@ -8,6 +8,7 @@ import { AudioFilesModule } from './audiofiles/audiofiles.module';
 import { getDbConfig } from './config/typeorm.config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { RoleModule } from './role/role.module';
 
 
 @Module({
@@ -25,6 +26,7 @@ import { AuthModule } from './auth/auth.module';
     FileWatcherServiceModule,
     UsersModule,
     AuthModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService, ConfigService],

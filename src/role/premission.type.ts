@@ -1,4 +1,4 @@
-import { UsersPremission } from "./../users/users.premission";
+import { UsersPremission } from "./enums/users.premission";
 
 export const Premission = {
     ...UsersPremission

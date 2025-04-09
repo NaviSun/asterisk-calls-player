@@ -126,10 +126,6 @@ export class UsersService {
     adminUpdateDto: AdminUpdateUserDto,
     currentUser: UserEntity
   ): Promise<UserEntity> {
-    if (currentUser.role !== 'admin') {
-      throw new ForbiddenException('Only admin can perform this action');
-    }
-
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);

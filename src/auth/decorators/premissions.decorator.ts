@@ -1,5 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
-import { PremissionType } from "../premission.type";
+import { PremissionType } from "../../role/premission.type";
 
 export const PREMISSION_KEY = 'authTypremissionpe';
 
