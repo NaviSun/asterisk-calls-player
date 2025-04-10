@@ -6,9 +6,7 @@ import { SignInDto } from './dto/sign-in.dto/sign-in.dto';
 import { Auth } from '../decorators/auth.decorator';
 import { AuthType } from './enum/auth-type.enum';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-// import { Roles } from './../../role/decorators/roles.decorator'; // Для защиты по ролям
-// import { UserRole } from './../../role/enums/user-role.enum'; // Для защиты по ролям
-import { Premissions } from '../decorators/premissions.decorator';
+import { Premissions } from '../../role/decorators/premissions.decorator';
 import { Premission } from '../../role/premission.type';
 
 
@@ -95,6 +93,9 @@ export class AuthenticationController {
         return await this.authService.login(signInDto);
     }
 
+    @ApiOperation({
+        description: 'Обновить токен'
+    })
     @HttpCode(HttpStatus.OK)
     @Post('refresh-tokens')
     refreshTokens(@Body() refreshTokenDto: RefreshTokenDto){

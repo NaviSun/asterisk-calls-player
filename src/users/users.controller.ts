@@ -1,9 +1,11 @@
 import { Controller, Body, Get, Query, UsePipes, ValidationPipe, Param, Patch, UseFilters, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth,} from '@nestjs/swagger';
-import { UpdateUserDto, ChangePasswordDto, UpdateUserStatusDto } from './dto/update-user.dto';
+import { UpdateUserDto, ChangePasswordDto, UpdateUserStatusDto, UpdateUserAvatarDto } from './dto/update-user.dto';
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
-import { Request } from 'express';
+import { Premissions } from 'src/role/decorators/premissions.decorator';
+import { Premission } from 'src/role/premission.type';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 
 
 @ApiTags('Users')
@@ -18,6 +20,7 @@ export class UsersController {
       +=== Поиск пользователя по email ===
   */
   @Get()
+  @Premissions(Premission.FindUser)
   @ApiOperation({
     summary: 'Поиск пользователя по email',
     description: 'Возвращает информацию о пользователе по его email адресу'
@@ -43,23 +46,31 @@ export class UsersController {
   /* 
       ==== Обновить данные пользователя
   */
-
-     
-
+  @Premissions(Premission.UpdateUser)
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить данные пользователя' })
   async updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
-    @Req() req: Request
   ) {
-    return this.usersService.updateUser(id, updateUserDto, req);
+    return this.usersService.updateUser(id, updateUserDto);
+  }
+    /* 
+      ==== Обновить аватар пользователя
+  */
+  @Patch(':id/avatar')
+  @ApiOperation({ summary: 'Обновить Аватар пользователя' })
+  async updateAvatar(
+    @Param('id') id: number,
+    @Body() updateAvatarDto: UpdateUserAvatarDto,
+  ) {
+    return this.usersService.updateAvatar(id, updateAvatarDto);
   }
 
   /* 
     === Смена пароля
   */
-
+  @Premissions(Premission.UpdateUser)
   @Patch(':id/password')
   @UseGuards( ThrottlerGuard)
   @Throttle({ default: { limit: 5, ttl: 3600 } }) // 5 попыток в час
@@ -67,25 +78,22 @@ export class UsersController {
   async changePassword(
     @Param('id') id: number,
     @Body() changePasswordDto: ChangePasswordDto,
-    @Req() req: Request
   ) {
-    return this.usersService.changePassword(id, changePasswordDto, req);
+    return this.usersService.changePassword(id, changePasswordDto);
   }
 
   /* 
     === Смена статуса пользователя banned
   */
-/*   @Patch(':id/status')
-  @UseGuards( RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Patch(':id/status')
+  @Premissions(Premission.UpdateUser)
   @UseFilters(HttpExceptionFilter)
-  @ApiOperation({ summary: 'Изменить статус пользователя (admin only)' })
+  @ApiOperation({ summary: 'Изменить статус пользователя' })
   async updateStatus(
     @Param('id') id: number,
     @Body() updateStatusDto: UpdateUserStatusDto,
-    @UserId() currentUser: UserEntity
   ) {
-    return this.usersService.updateStatus(id, updateStatusDto, currentUser);
-  } */
+    return this.usersService.updateStatus(id, updateStatusDto);
+  } 
 
 }

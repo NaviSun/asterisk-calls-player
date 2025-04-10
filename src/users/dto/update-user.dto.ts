@@ -1,25 +1,39 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
-import { IsBoolean, IsDate, IsString, IsOptional, IsEmail, MinLength, IsEnum } from 'class-validator';
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { IsBoolean, IsDate, IsString, IsOptional, IsEmail, MinLength, IsEnum, IsArray, IsInt } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+
 // Базовый DTO для обновления основных данных
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @ApiProperty({ example: 'Иван', description: 'Имя пользователя', required: false })
+export class UpdateUserDto {
+  @ApiPropertyOptional({ example: 'Иван' })
   @IsOptional()
   @IsString()
   firstName?: string;
 
-  @ApiProperty({ example: 'Иванов', description: 'Фамилия пользователя', required: false })
+  @ApiPropertyOptional({ example: 'Иванов' })
   @IsOptional()
   @IsString()
   lastName?: string;
 
-  @ApiProperty({ example: 'user@example.com', description: 'Email пользователя', required: false })
+  @ApiPropertyOptional({ example: 'user@example.com' })
   @IsOptional()
   @IsEmail()
   email?: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @MinLength(8)
+  password?: string;
+
+  @ApiPropertyOptional({ 
+    type: [Number],
+    description: 'Array of role IDs',
+    example: [1, 2] 
+  })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  roleIds?: number[];
 }
 
 // DTO для обновления аватара

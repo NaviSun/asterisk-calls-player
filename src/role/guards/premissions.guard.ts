@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { ActiveUserData } from '../../auth/interface/active_user_data_jwt.interface';
 import { REQUEST_USER_KEY } from '../../auth/auth.constants';
-import { PREMISSION_KEY } from 'src/auth/decorators/premissions.decorator';
+import { PREMISSION_KEY } from 'src/role/decorators/premissions.decorator';
 import { PremissionType } from 'src/role/premission.type';
 
 

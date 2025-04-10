@@ -18,10 +18,13 @@ import {
     ApiBearerAuth
 } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
+import { Premissions } from './../role/decorators/premissions.decorator';
+import { Premission } from './../role/premission.type';
 
 
 @ApiTags('Audio Files Management')
 @ApiBearerAuth()
+@Premissions(Premission.ReadController)
 @Controller('audiofiles/file')
 @UseFilters(new HttpExceptionFilter())
 export class AudiofilesController {

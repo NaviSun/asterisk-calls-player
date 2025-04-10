@@ -82,7 +82,7 @@ export class FileWatcherService implements OnModuleInit {
         ".*/**",
       ],
       poll: true,
-      interval: 2000,
+      interval: 3000,
     });
 
     // Запуск наблюдателя

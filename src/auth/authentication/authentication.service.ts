@@ -73,6 +73,9 @@ export class AuthenticationService {
         if (!user) {
             throw new UnauthorizedException('Пользователь не существует');
         }
+        if(user.banned){
+            throw new UnauthorizedException(`Доступ запрещен по причине: ${user.banReason}`);
+        }
         const isEqual = await this.hashingService.compare(signInDto.password, user.passwordHash);
         if (!isEqual) {
             throw new UnauthorizedException('Имя пользователя или пароль не совпадают')
@@ -116,9 +119,8 @@ export class AuthenticationService {
                 });
             const user = await this.userRepository.findOne({
                 where: { id: sub, },
-                relations: ['roles', 'roles.permission'],
+                relations: ['roles', 'roles.permissions'],
             })
-
             if (!user) {
                 throw new UnauthorizedException('Пользователь не существует');
             }
@@ -134,7 +136,7 @@ export class AuthenticationService {
             if (error instanceof InvalidateRefreshTokenError) {
                 throw new UnauthorizedException('Доступ запрещен')
             }
-            throw new UnauthorizedException('Вы не Авторизованы 3')
+            throw new UnauthorizedException('Ошибка Токена')
         }
     }
 

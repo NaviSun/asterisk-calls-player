@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
+import { RoleService } from 'src/role/role.service';
+import { RoleModule } from 'src/role/role.module';
 
 
 @Module({
@@ -17,6 +19,7 @@ import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
       ttl: 60000, // 1 minute
       limit: 10,
     }]),
+    RoleModule
   ],
   controllers: [UsersController],
   providers: [

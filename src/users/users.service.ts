@@ -3,8 +3,8 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
-  ForbiddenException,
   Logger,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -13,10 +13,12 @@ import {
   UpdateUserDto,
   ChangePasswordDto,
   UpdateUserStatusDto,
-  AdminUpdateUserDto
+  AdminUpdateUserDto,
+  UpdateUserAvatarDto
 } from './dto/update-user.dto';
-import { Request } from 'express';
 import { Repository } from 'typeorm';
+import { RoleService } from 'src/role/role.service';
+import { RoleEntity } from 'src/role/entity/role.entity';
 
 
 @Injectable()
@@ -26,6 +28,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly roleService: RoleService
   ) { }
 
   /* 
@@ -33,41 +36,81 @@ export class UsersService {
   */
 
   async findOne(email: string): Promise<UserEntity | null> {
-    return this.userRepository.findOneBy({ email });
+    return this.userRepository.findOne({ where: { email }, relations: ['roles', 'roles.permissions'] });
   }
   /* 
     ==== Обновление данных пользователя
   */
-  async updateUser(id: number, updateUserDto: UpdateUserDto, req: Request): Promise<UserEntity> {
-    /* this.validateUserAccess(id, req); */
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
 
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles']
+    });
+
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Пользователь с ID ${id} не найден`);
     }
 
-    if (updateUserDto.email && updateUserDto.email !== user.email) {
-      await this.checkEmailUniqueness(updateUserDto.email);
+    // 2. Обновляем только переданные поля
+    const updatetedUser = this.applyUserUpdates(user, updateUserDto);
+
+    // 3. Обработка ролей (если переданы)
+    if (updateUserDto.roleIds !== undefined) {
+      const roles = await this.updateUserRoles(updateUserDto.roleIds);
+      updatetedUser.roles = roles;
     }
 
-    Object.assign(user, updateUserDto);
-    return this.userRepository.save(user);
+    // 6. Сохраняем обновленные данные
+    return this.userRepository.save(updatetedUser);
+  }
+  private applyUserUpdates(user: UserEntity, dto: UpdateUserDto): UserEntity {
+    if (dto.firstName !== undefined) {
+      user.firstName = dto.firstName;
+    }
+
+    if (dto.lastName !== undefined) {
+      user.lastName = dto.lastName;
+    }
+
+    if (dto.email !== undefined && dto.email !== user.email) {
+      this.checkEmailUniqueness(dto.email);
+      user.email = dto.email;
+    }
+    return user;
   }
 
+  private async updateUserRoles(roleIds: number[]): Promise<RoleEntity[]> {
+    // Если передали пустой массив - очищаем роли
+    if (roleIds.length === 0) {
+      return [];
+    }
+
+    // Находим все указанные роли
+    const roles = await this.roleService.findRoleById(roleIds);
+
+    // Проверяем, что все роли найдены
+    if (roles.length !== roleIds.length) {
+      const foundIds = roles.map(role => role.id);
+      const missingIds = roleIds.filter(id => !foundIds.includes(id));
+      throw new NotFoundException(
+        `Роли с ID ${missingIds.join(', ')} не найдены`
+      );
+    }
+
+    return roles;
+  }
 
   /* 
   ===== Обновление Аватар Пользователя
   */
 
-  async updateAvatar(id: number, avatar: string, req: Request): Promise<UserEntity> {
-    /* this.validateUserAccess(id, req); */
-
+  async updateAvatar(id: number, updateAvatarDto: UpdateUserAvatarDto): Promise<UserEntity> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-
-    user.avatar = avatar;
+    user.avatar = updateAvatarDto.avatar;
     return this.userRepository.save(user);
   }
   /* 
@@ -76,9 +119,7 @@ export class UsersService {
   async changePassword(
     id: number,
     changePasswordDto: ChangePasswordDto,
-    req: Request
   ): Promise<UserEntity> {
-    /*  this.validateUserAccess(id, req); */
 
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
@@ -102,19 +143,16 @@ export class UsersService {
   async updateStatus(
     id: number,
     updateStatusDto: UpdateUserStatusDto,
-    currentUser: UserEntity
   ): Promise<UserEntity> {
 
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-
     user.banned = updateStatusDto.banned;
     if (updateStatusDto.banReason !== undefined) {
       user.banReason = updateStatusDto.banned ? updateStatusDto.banReason : '';
     }
-
     return this.userRepository.save(user);
   }
 

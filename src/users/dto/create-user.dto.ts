@@ -31,5 +31,5 @@ export class CreateUserDto {
       default: '',
       description: 'Роль пользователя' 
     })
-    premissions: [string];
+    roles: [string];
   }
